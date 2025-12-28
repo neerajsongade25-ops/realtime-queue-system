@@ -25,44 +25,61 @@ const Register = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: 'auto' }}>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input 
-          type="text" 
-          name="name" 
-          placeholder="Full Name" 
-          onChange={handleChange} 
-          required 
-          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <input 
-          type="email" 
-          name="email" 
-          placeholder="Email" 
-          onChange={handleChange} 
-          required 
-          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <input 
-          type="password" 
-          name="password" 
-          placeholder="Password" 
-          onChange={handleChange} 
-          required 
-          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <select 
-          name="role" 
-          onChange={handleChange} 
-          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-        >
-          <option value="student">Student</option>
-          <option value="mentor">Mentor</option>
-        </select>
-        <button type="submit" style={{ width: '100%', padding: '10px' }}>Register</button>
-      </form>
-      <p>Already have an account? <Link to="/">Login here</Link></p>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>🚀 Create Account</h2>
+        <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+          Join the mentorship queue system
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          <input 
+            className="form-input"
+            type="text" 
+            name="name" 
+            placeholder="Full Name" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            className="form-input"
+            type="email" 
+            name="email" 
+            placeholder="Email Address" 
+            onChange={handleChange} 
+            required 
+          />
+          <input 
+            className="form-input"
+            type="password" 
+            name="password" 
+            placeholder="Choose Password" 
+            onChange={handleChange} 
+            required 
+          />
+          
+          <div style={{ textAlign: 'left', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#374151' }}>
+            I am a:
+          </div>
+          <select 
+            className="form-input"
+            name="role" 
+            onChange={handleChange}
+            style={{ backgroundColor: 'white' }}
+          >
+            <option value="student">Student (Asking for help)</option>
+            <option value="mentor">Mentor (Giving help)</option>
+          </select>
+
+          <button type="submit" className="btn-primary">
+            Register Now
+          </button>
+        </form>
+
+        <p style={{ marginTop: '1rem', color: '#666' }}>
+          Already have an account? <Link to="/" style={{ color: '#4f46e5', fontWeight: 'bold' }}>Login here</Link>
+        </p>
+      </div>
     </div>
   );
 };

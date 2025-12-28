@@ -8,99 +8,86 @@ const MentorDashboard = () => {
   const [tickets, setTickets] = useState([]);
   const navigate = useNavigate();
 
-  // 1. Initial Data Load & Auth Check
   useEffect(() => {
-    const role = localStorage.getItem('role');
-    if (role !== 'mentor') navigate('/');
-
-    // Load existing tickets from Database
     const fetchTickets = async () => {
       const res = await axios.get('http://localhost:5000/api/tickets');
       setTickets(res.data);
     };
     fetchTickets();
-  }, [navigate]);
+  }, []);
 
-  // 2. REAL-TIME LISTENERS
   useEffect(() => {
-    // When a student creates a ticket
     socket.on('new_ticket', (ticket) => {
       setTickets((prev) => [ticket, ...prev]);
       toast.info(`🔔 New Ticket: ${ticket.title}`);
     });
-
-    // When a ticket status changes (claimed/resolved)
     socket.on('ticket_updated', (updatedTicket) => {
-      setTickets((prev) => 
-        prev.map((t) => t._id === updatedTicket._id ? updatedTicket : t)
-      );
+      setTickets((prev) => prev.map((t) => t._id === updatedTicket._id ? updatedTicket : t));
     });
-
-    // Cleanup listeners on unmount
-    return () => {
-      socket.off('new_ticket');
-      socket.off('ticket_updated');
-    };
+    return () => { socket.off('new_ticket'); socket.off('ticket_updated'); };
   }, []);
 
-  // 3. Action: Claim Ticket
-  const claimTicket = async (ticketId) => {
+  const handleAction = async (ticketId, status) => {
     try {
       const mentorId = localStorage.getItem('userId');
-      await axios.patch(`http://localhost:5000/api/tickets/${ticketId}`, {
-        status: 'in-progress',
-        mentorId
-      });
-      // Note: We don't need to manually update state here, 
-      // because the Server will emit 'ticket_updated', which we listen for above!
-    } catch (err) {
-      toast.error('Error claiming ticket');
-    }
+      await axios.patch(`http://localhost:5000/api/tickets/${ticketId}`, { status, mentorId });
+      toast.success(status === 'in-progress' ? 'Ticket Claimed!' : 'Ticket Resolved!');
+    } catch (err) { toast.error('Action Failed'); }
   };
 
-  // 4. Action: Resolve Ticket
-  const resolveTicket = async (ticketId) => {
-    try {
-      await axios.patch(`http://localhost:5000/api/tickets/${ticketId}`, {
-        status: 'resolved'
-      });
-    } catch (err) {
-      toast.error('Error resolving ticket');
-    }
+  const logout = () => {
+    localStorage.clear();
+    navigate('/');
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>👨‍🏫 Mentor Dashboard</h1>
-      <p>Watching for new tickets...</p>
+    <>
+      <nav className="navbar">
+        <div className="logo">QueueSystem <span style={{fontSize: '0.8rem', color: '#666', fontWeight: 'normal'}}>(Mentor View)</span></div>
+        <button onClick={logout} className="nav-btn">Logout</button>
+      </nav>
 
-      <div style={{ display: 'grid', gap: '10px' }}>
-        {tickets.map((ticket) => (
-          <div key={ticket._id} style={{ 
-            border: '1px solid #ccc', 
-            padding: '15px', 
-            background: ticket.status === 'pending' ? '#fff3cd' : '#d4edda' 
-          }}>
-            <h3>{ticket.title}</h3>
-            <p>{ticket.description}</p>
-            <p><strong>Student:</strong> {ticket.student?.name}</p>
-            <p><strong>Status:</strong> {ticket.status.toUpperCase()}</p>
-            
-            {ticket.status === 'pending' && (
-              <button onClick={() => claimTicket(ticket._id)} style={{ background: 'green', color: 'white', padding: '5px 10px' }}>
-                Claim Ticket
-              </button>
-            )}
+      <div className="dashboard-container">
+        <div className="header-section">
+          <h1>Live Queue</h1>
+          <span className="status-badge badge-in-progress" style={{ fontSize: '1rem' }}>
+            {tickets.filter(t => t.status === 'pending').length} Pending
+          </span>
+        </div>
 
-            {ticket.status === 'in-progress' && (
-              <button onClick={() => resolveTicket(ticket._id)} style={{ background: 'blue', color: 'white', padding: '5px 10px' }}>
-                Mark Resolved
-              </button>
-            )}
-          </div>
-        ))}
+        <div className="ticket-grid">
+          {tickets.map((ticket) => (
+            <div key={ticket._id} className={`ticket-card status-${ticket.status}`}>
+              <div>
+                <div className="ticket-header">
+                  <span className="ticket-title">{ticket.title}</span>
+                  <span className={`status-badge badge-${ticket.status}`}>{ticket.status}</span>
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                  <small style={{ color: '#6b7280' }}>Student: <strong>{ticket.student?.name}</strong></small>
+                </div>
+                <p className="ticket-desc">{ticket.description}</p>
+              </div>
+
+              {/* ACTION BUTTONS */}
+              {ticket.status === 'pending' && (
+                <button onClick={() => handleAction(ticket._id, 'in-progress')} className="btn-action btn-claim">
+                  ✋ Claim Ticket
+                </button>
+              )}
+              {ticket.status === 'in-progress' && (
+                <button onClick={() => handleAction(ticket._id, 'resolved')} className="btn-action btn-resolve">
+                  ✅ Mark Resolved
+                </button>
+              )}
+              {ticket.status === 'resolved' && (
+                 <div style={{textAlign: 'center', color: '#10b981', fontWeight: 'bold'}}>✨ Resolved</div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
