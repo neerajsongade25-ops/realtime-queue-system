@@ -1,12 +1,9 @@
 const router = require('express').Router();
 const Ticket = require('../models/Ticket');
-const User = require('../models/User');
 
 // 1. CREATE TICKET (Student)
-// POST /api/tickets
 router.post('/', async (req, res) => {
   try {
-    // We expect the frontend to send: { studentId, title, description }
     const { studentId, title, description } = req.body;
 
     const newTicket = new Ticket({
@@ -17,9 +14,10 @@ router.post('/', async (req, res) => {
     });
 
     const savedTicket = await newTicket.save();
-    
-    // Populate user details so the frontend sees "Neeraj" instead of just an ID
     const populatedTicket = await savedTicket.populate('student', 'name');
+
+    // 🔥 REAL-TIME ALERT: Tell everyone a new ticket exists!
+    req.io.emit('new_ticket', populatedTicket);
 
     res.status(201).json(populatedTicket);
 
@@ -28,11 +26,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-// 2. GET ALL TICKETS (Mentor Dashboard)
-// GET /api/tickets
+// 2. GET ALL TICKETS
 router.get('/', async (req, res) => {
   try {
-    // Get all tickets, sort by newest first, and show User names
     const tickets = await Ticket.find()
       .populate('student', 'name')
       .populate('mentor', 'name')
@@ -45,32 +41,25 @@ router.get('/', async (req, res) => {
 });
 
 // 3. UPDATE TICKET (Claim / Resolve)
-// PATCH /api/tickets/:id
 router.patch('/:id', async (req, res) => {
   try {
     const { status, mentorId } = req.body;
     const ticketId = req.params.id;
 
-    // Updates to apply
     let updates = { status };
-    
-    // If a mentor is claiming it, add their ID
-    if (mentorId) {
-        updates.mentor = mentorId;
-    }
-    
-    // If resolving, mark the time
-    if (status === 'resolved') {
-        updates.resolvedAt = new Date();
-    }
+    if (mentorId) updates.mentor = mentorId;
+    if (status === 'resolved') updates.resolvedAt = new Date();
 
     const updatedTicket = await Ticket.findByIdAndUpdate(
         ticketId, 
         updates, 
-        { new: true } // Return the updated version
+        { new: true }
     )
     .populate('student', 'name')
     .populate('mentor', 'name');
+
+    // 🔥 REAL-TIME ALERT: Tell everyone a ticket status changed!
+    req.io.emit('ticket_updated', updatedTicket);
 
     res.json(updatedTicket);
 
