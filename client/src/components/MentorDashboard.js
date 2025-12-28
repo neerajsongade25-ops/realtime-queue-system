@@ -3,6 +3,7 @@ import axios from 'axios';
 import socket from '../socket';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 const MentorDashboard = () => {
   const [tickets, setTickets] = useState([]);
@@ -44,6 +45,7 @@ const MentorDashboard = () => {
     <>
       <nav className="navbar">
         <div className="logo">QueueSystem <span style={{fontSize: '0.8rem', color: '#666', fontWeight: 'normal'}}>(Mentor View)</span></div>
+        <ThemeToggle /> {/* <--- ADD HERE */}
         <button onClick={logout} className="nav-btn">Logout</button>
       </nav>
 

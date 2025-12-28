@@ -209,3 +209,36 @@ body {
 
 .btn-claim { background: var(--primary); color: white; }
 .btn-resolve { background: var(--success); color: white; }
+
+/* ... Keep your existing :root and other styles ... */
+
+/* 🌙 DARK MODE VARIABLES */
+[data-theme='dark'] {
+  --bg-color: #111827;       /* Very Dark Blue/Gray */
+  --card-bg: #1f2937;        /* Lighter Dark Gray */
+  --text-main: #f3f4f6;      /* White text */
+  --text-light: #9ca3af;     /* Light Gray text */
+  --primary: #6366f1;        /* Brighter Indigo */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); /* Darker Shadow */
+}
+
+/* Toggle Button Style */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--text-light);
+  color: var(--text-main);
+  padding: 0.5rem 0.8rem;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  background: var(--card-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}

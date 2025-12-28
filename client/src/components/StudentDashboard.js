@@ -3,6 +3,7 @@ import axios from 'axios';
 import socket from '../socket';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle'; // <--- Import
 
 const StudentDashboard = () => {
   const [title, setTitle] = useState('');
@@ -39,6 +40,8 @@ const StudentDashboard = () => {
     } catch (err) { toast.error('Failed to create ticket'); }
   };
 
+
+
   const logout = () => {
     localStorage.clear();
     navigate('/');
@@ -48,6 +51,7 @@ const StudentDashboard = () => {
     <>
       <nav className="navbar">
         <div className="logo">QueueSystem</div>
+        <ThemeToggle />  {/* <--- ADD BUTTON HERE */}
         <button onClick={logout} className="nav-btn">Logout</button>
       </nav>
 

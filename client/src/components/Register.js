@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ThemeToggle from './ThemeToggle'; // Import
 
 const Register = () => {
   const [formData, setFormData] = useState({ 
@@ -29,6 +30,7 @@ const Register = () => {
       <div className="auth-card">
         <h2>🚀 Create Account</h2>
         <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+            <ThemeToggle />
           Join the mentorship queue system
         </p>
 

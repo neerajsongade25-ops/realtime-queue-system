@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ThemeToggle from './ThemeToggle'; // Import
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -37,6 +38,7 @@ const Login = () => {
           <button className="btn-primary" type="submit">Login</button>
         </form>
         <p style={{ marginTop: '1rem', color: '#666' }}>
+            <ThemeToggle />
           New here? <Link to="/register" style={{ color: '#4f46e5' }}>Create an account</Link>
         </p>
       </div>
